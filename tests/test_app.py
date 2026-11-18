@@ -20,3 +20,9 @@ def test_health_returns_up():
 
     assert response.status_code == 200
     assert response.json == {"status": "UP"}
+    
+def test_home_returns_app_status():
+    response = app.test_client().get("/")
+
+    assert response.status_code == 200
+    assert response.json == {"app": "Quote API", "status": "running"}
