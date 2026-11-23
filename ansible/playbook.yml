@@ -1,0 +1,38 @@
+---
+- name: Configure and deploy Quote API server
+  hosts: appservers
+  become: yes
+  vars:
+    app_port: 8081
+  roles:
+    - common
+  tasks:
+    - name: Ensure OpenJDK 17 runtime is installed
+      apt:
+        name: openjdk-17-jre-headless
+        state: present
+
+    - name: Copy built JAR artifact
+      copy:
+        src: ../target/quote-api.jar
+        dest: /opt/quote-api/quote-api.jar
+      notify: restart quote-api
+
+    - name: Deploy systemd service unit
+      template:
+        src: app.service.j2
+        dest: /etc/systemd/system/quote-api.service
+      notify: restart quote-api
+
+    - name: Ensure quote-api service is started and enabled
+      systemd:
+        name: quote-api
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+  handlers:
+    - name: restart quote-api
+      systemd:
+        name: quote-api
+        state: restarted

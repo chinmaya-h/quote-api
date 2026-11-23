@@ -1,0 +1,6 @@
+---
+- name: Create application directory
+  file:
+    path: /opt/quote-api
+    state: directory
+    mode: '0755'
